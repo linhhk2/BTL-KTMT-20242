@@ -21,3 +21,6 @@ always @(*) begin
     default            : ALUcontrol_Out <= 4'b0000; 
   endcase
 end
+
+
+endmodule
