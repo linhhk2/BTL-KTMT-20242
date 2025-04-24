@@ -1,24 +1,31 @@
+module Data_Memory(
+    input clk,               
+    input rst,               
+    input MemRead,           
+    input MemWrite,          
+    input [31:0] address,    
+    input [31:0] write_data, 
+    output[31:0] read_data 
+);
+  reg [31:0] D_Memory [63:0];
 
-module Data_Memory(clk,rst,WE,WD,A,RD);
+  integer k;
 
-    input clk,rst,WE;
-    input [31:0]A,WD;
-    output [31:0]RD;
+  assign read_data = (MemRead) ? D_Memory[address] : 32'b00;
 
-    reg [31:0] mem [1023:0];
+  always @(posedge clk) begin
+	D_Memory[17] = 56;
+	D_Memory[15] = 65;
+end 
 
-    always @ (posedge clk)
-    begin
-        if(WE)
-            mem[A] <= WD;
+  always @(posedge clk or posedge rst) begin
+    if (rst ) begin
+      for (k = 0; k < 64; k = k + 1) begin
+        D_Memory[k] = 32'b00;
+      end
+    end else if (MemWrite) begin
+      D_Memory[address] = write_data;
     end
-
-    assign RD = (~rst) ? 32'd0 : mem[A];
-
-    initial begin
-        mem[0] = 32'h00000000;
-        //mem[40] = 32'h00000002;
-    end
-
+  end
 
 endmodule
