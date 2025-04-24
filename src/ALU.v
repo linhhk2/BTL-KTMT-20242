@@ -1,26 +1,27 @@
-module ALU(A,B,Result,ALUControl,OverFlow,Carry,Zero,Negative);
+module ALU(
+    input [31:0] A,             
+    input [31:0] B,            
+    input [3:0] ALUcontrol_In,          
+    output reg [31:0] Result,   
+    output reg Zero             
+);
 
-    input [31:0]A,B;
-    input [2:0]ALUControl;
-    output Carry,OverFlow,Zero,Negative;
-    output [31:0]Result;
+    always @(A or B or ALUcontrol_In) begin
+        case (ALUcontrol_In)
+            4'b0000: Result = A + B;           		// ADD
+            4'b0001: Result = A - B;           		// SUB
+            4'b0010: Result = A & B;           		// AND
+            4'b0011: Result = A | B;           		// OR
+            4'b0100: Result = A ^ B;           		// XOR
+            4'b0101: Result = A << B[4:0];     		// SLL (Shift Left Logical)
+            4'b0110: Result = A >> B[4:0];     		// SRL (Shift Right Logical)
+            4'b0111: Result = $signed(A) >>> B[4:0];    // SRA (Shift Right Arithmetic)
+            4'b1000: Result =($signed(A) < $signed(B)) ? 32'b1 : 32'b0;
+            default: Result = 32'b0;          		
+        endcase
 
-    wire Cout;
-    wire [31:0]Sum;
-
-    assign {Cout,Sum} = (ALUControl[0] == 1'b0) ? A + B :
-                                          (A + ((~B)+1)) ;
-    assign Result = (ALUControl == 3'b000) ? Sum :
-                    (ALUControl == 3'b001) ? Sum :
-                    (ALUControl == 3'b010) ? A & B :
-                    (ALUControl == 3'b011) ? A | B :
-                    (ALUControl == 3'b101) ? {{31{1'b0}},(Sum[31])} : {32{1'b0}};
-    
-    assign OverFlow = ((Sum[31] ^ A[31]) & 
-                      (~(ALUControl[0] ^ B[31] ^ A[31])) &
-                      (~ALUControl[1]));
-    assign Carry = ((~ALUControl[1]) & Cout);
-    assign Zero = &(~Result);
-    assign Negative = Result[31];
+        
+        Zero = (Result == 32'b0) ? 1 : 0;
+    end
 
 endmodule
