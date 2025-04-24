@@ -1,24 +1,61 @@
+module Register_File(clk, rst, RegWrite,Rs1,Rs2, Rd,Write_data,read_data1, read_data2);
 
-module Register_File(clk,rst,WE3,WD3,A1,A2,A3,RD1,RD2);
+input clk, rst, RegWrite;
+input [4:0] Rs1,Rs2, Rd;
+input [31:0] Write_data;
+output [31:0] read_data1, read_data2;
 
-    input clk,rst,WE3;
-    input [4:0]A1,A2,A3;
-    input [31:0]WD3;
-    output [31:0]RD1,RD2;
+reg [31:0] Registers [31:0];
 
-    reg [31:0] Register [31:0];
+ initial begin
+Registers[0] = 0;
+Registers[1] = 3;
+Registers[2] = 2;
+Registers[3] = 12;
+Registers[4] = 20;
+Registers[5] = 3;
+Registers[6] = 44;
+Registers[7] = 4;
+Registers[8] = 2;
+Registers[9] = 1;
+Registers[10] = 23;
+Registers[11] = 4;
+Registers[12] = 90;
+Registers[13] = 10;
+Registers[14] = 20;
+Registers[15] = 30;
+Registers[16] = 40;
+Registers[17] = 50;
+Registers[18] = 60;
+Registers[19] = 70;
+Registers[20] = 80;
+Registers[21] = 80;
+Registers[22] = 90;
+Registers[23] = 70;
+Registers[24] = 60;
+Registers[25] = 65;
+Registers[26] = 4;
+Registers[27] = 32;
+Registers[28] = 12;
+Registers[29] = 34;
+Registers[30] = 5;
+Registers[31] = 10;
+end
 
-    always @ (posedge clk)
-    begin
-        if(WE3 & (A3 != 5'h00))
-            Register[A3] <= WD3;
+integer k;
+always @(posedge clk) begin
+if (rst) 
+begin
+      for (k = 0; k < 32; k = k + 1) begin
+        Registers[k] = 32'b00;
+      end
     end
 
-    assign RD1 = (rst==1'b0) ? 32'd0 : Register[A1];
-    assign RD2 = (rst==1'b0) ? 32'd0 : Register[A2];
-
-    initial begin
-        Register[0] = 32'h00000000;
+    else if (RegWrite ) begin
+      Registers[Rd] = Write_data;
     end
+  end
 
+  assign read_data1 = Registers[Rs1];
+  assign read_data2 = Registers[Rs2];
 endmodule
